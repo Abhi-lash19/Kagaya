@@ -1,0 +1,31 @@
+{
+  "name": "kagaya",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Kagaya is a modern feature flag and experimentation platform built to enable safe, controlled, and data-driven feature releases.",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "echo \"dev scripts coming soon\"",
+    "test": "echo \"No root tests configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Abhi-lash19/Kagaya.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Abhi-lash19/Kagaya/issues"
+  },
+  "homepage": "https://github.com/Abhi-lash19/Kagaya#readme",
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "eslint": "^10.0.0",
+    "prettier": "^3.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
