@@ -13,7 +13,9 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users User[]
+  // Relations
+  users        User[]
+  featureFlags FeatureFlag[]
 }
 
 model User {
@@ -27,4 +29,28 @@ model User {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
+}
+
+/**
+ * Core feature flag model
+ * 
+ * MVP version:
+ * - Simple boolean toggle
+ * - Percentage rollout
+ * - Scoped per organization
+ */
+model FeatureFlag {
+  id                String   @id @default(uuid())
+  key               String
+  description       String?
+  enabled           Boolean  @default(false)
+  rolloutPercentage Int      @default(100) // 0–100 rollout
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@unique([organizationId, key]) // Prevent duplicate flag keys inside org
 }
