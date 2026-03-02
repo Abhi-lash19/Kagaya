@@ -57,5 +57,29 @@ export const resolvers = {
             const service = new FeatureFlagService(ctx.prisma);
             return service.createFlag(args);
         },
+
+        updateFeatureFlag: async (
+            _: unknown,
+            args: {
+                orgId: string;
+                key: string;
+                description?: string;
+                enabled?: boolean;
+                rolloutPercentage?: number;
+            },
+            ctx: GraphQLContext,
+        ) => {
+            const service = new FeatureFlagService(ctx.prisma);
+            return service.updateFlag(args);
+        },
+
+        deleteFeatureFlag: async (
+            _: unknown,
+            args: { orgId: string; key: string },
+            ctx: GraphQLContext,
+        ) => {
+            const service = new FeatureFlagService(ctx.prisma);
+            return service.deleteFlag(args.orgId, args.key);
+        },
     },
 };

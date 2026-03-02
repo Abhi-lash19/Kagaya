@@ -34,5 +34,20 @@ export const typeDefs = `
       enabled: Boolean
       rolloutPercentage: Int
     ): FeatureFlag!
+
+    # NEW: Partial update support
+    updateFeatureFlag(
+      orgId: String!
+      key: String!
+      description: String
+      enabled: Boolean
+      rolloutPercentage: Int
+    ): FeatureFlag!
+
+    # NEW: Delete flag
+    deleteFeatureFlag(
+      orgId: String!
+      key: String!
+    ): Boolean!
   }
 `;

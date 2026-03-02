@@ -9,6 +9,9 @@ type PrismaClientType = typeof prisma;
 export class FeatureFlagService {
     constructor(private prisma: PrismaClientType) { }
 
+    /**
+     * Create Feature Flag
+     */
     async createFlag(data: {
         orgId: string;
         key: string;
@@ -16,7 +19,6 @@ export class FeatureFlagService {
         enabled?: boolean;
         rolloutPercentage?: number;
     }) {
-        // 🔎 1️⃣ Validate organization exists
         const orgExists = await this.prisma.organization.findUnique({
             where: { id: data.orgId },
             select: { id: true },
@@ -32,7 +34,6 @@ export class FeatureFlagService {
             });
         }
 
-        // 🔒 2️⃣ Validate rollout percentage
         if (
             data.rolloutPercentage !== undefined &&
             (data.rolloutPercentage < 0 || data.rolloutPercentage > 100)
@@ -56,7 +57,6 @@ export class FeatureFlagService {
                 },
             });
         } catch (error: any) {
-            // 🧱 Unique constraint violation (duplicate key per org)
             if (error.code === 'P2002') {
                 throw new GraphQLError(
                     'Feature flag with this key already exists for this organization',
@@ -91,6 +91,9 @@ export class FeatureFlagService {
         }
     }
 
+    /**
+     * Get Flags by Organization
+     */
     async getFlagsByOrg(orgId: string) {
         return this.prisma.featureFlag.findMany({
             where: { organizationId: orgId },
@@ -98,6 +101,90 @@ export class FeatureFlagService {
         });
     }
 
+    /**
+     * Update Feature Flag (partial update)
+     */
+    async updateFlag(data: {
+        orgId: string;
+        key: string;
+        description?: string;
+        enabled?: boolean;
+        rolloutPercentage?: number;
+    }) {
+        const existing = await this.prisma.featureFlag.findUnique({
+            where: {
+                organizationId_key: {
+                    organizationId: data.orgId,
+                    key: data.key,
+                },
+            },
+        });
+
+        if (!existing) {
+            throw new GraphQLError('Feature flag not found', {
+                extensions: { code: 'NOT_FOUND' },
+            });
+        }
+
+        if (
+            data.rolloutPercentage !== undefined &&
+            (data.rolloutPercentage < 0 || data.rolloutPercentage > 100)
+        ) {
+            throw new GraphQLError('Rollout percentage must be between 0 and 100', {
+                extensions: { code: 'BAD_USER_INPUT' },
+            });
+        }
+
+        return this.prisma.featureFlag.update({
+            where: {
+                organizationId_key: {
+                    organizationId: data.orgId,
+                    key: data.key,
+                },
+            },
+            data: {
+                description: data.description ?? existing.description,
+                enabled: data.enabled ?? existing.enabled,
+                rolloutPercentage:
+                    data.rolloutPercentage ?? existing.rolloutPercentage,
+            },
+        });
+    }
+
+    /**
+     * Delete Feature Flag
+     */
+    async deleteFlag(orgId: string, key: string): Promise<boolean> {
+        const existing = await this.prisma.featureFlag.findUnique({
+            where: {
+                organizationId_key: {
+                    organizationId: orgId,
+                    key,
+                },
+            },
+        });
+
+        if (!existing) {
+            throw new GraphQLError('Feature flag not found', {
+                extensions: { code: 'NOT_FOUND' },
+            });
+        }
+
+        await this.prisma.featureFlag.delete({
+            where: {
+                organizationId_key: {
+                    organizationId: orgId,
+                    key,
+                },
+            },
+        });
+
+        return true;
+    }
+
+    /**
+     * Evaluate Feature Flag
+     */
     async evaluateFlag(
         orgId: string,
         key: string,
@@ -112,8 +199,7 @@ export class FeatureFlagService {
             },
         });
 
-        if (!flag) return false;
-        if (!flag.enabled) return false;
+        if (!flag || !flag.enabled) return false;
 
         const bucket = percentageHash(`${userId}:${key}`);
 
