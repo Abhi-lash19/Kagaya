@@ -2,35 +2,19 @@
   "name": "kagaya",
   "private": true,
   "version": "1.0.0",
-  "description": "Kagaya is a modern feature flag and experimentation platform built to enable safe, controlled, and data-driven feature releases.",
   "workspaces": [
     "apps/*",
     "packages/*",
     "services/*"
   ],
   "scripts": {
-    "dev": "echo \"dev scripts coming soon\"",
-    "test": "echo \"No root tests configured\""
+    "dev:api": "npm run dev --workspace=@kagaya/api",
+    "db:migrate": "npm run migrate --workspace=@kagaya/database"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Abhi-lash19/Kagaya.git"
-  },
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Abhi-lash19/Kagaya/issues"
-  },
-  "homepage": "https://github.com/Abhi-lash19/Kagaya#readme",
   "devDependencies": {
-    "@types/node": "^25.3.0",
-    "eslint": "^4.1.1",
-    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@prisma/client": "^7.4.1",
-    "fastify": "^5.7.4",
-    "prisma": "^6.19.2"
+    "@types/node": "^20.11.30",
+    "prettier": "^3.2.5"
   }
 }
