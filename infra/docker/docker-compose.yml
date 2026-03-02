@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: pulseflag-postgres
+    environment:
+      POSTGRES_USER: pulseflag
+      POSTGRES_PASSWORD: pulseflag
+      POSTGRES_DB: pulseflag
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: pulseflag-redis
+    ports:
+      - "6379:6379"
